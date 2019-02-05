@@ -4,10 +4,10 @@ from difflib import get_close_matches
 from flask import request, jsonify
 from cachetools import cached, TTLCache
 
-cache_validateDomain = TTLCache(maxsize=8000, ttl=2000)
-cache_suggestDomain = TTLCache(maxsize=8000, ttl=2000) # set a lower ttl for new domains added to the safelist during i_validateDomain_MX to come into affect
+cache_validateDomain = TTLCache(maxsize=1000, ttl=300)
+cache_suggestDomain = TTLCache(maxsize=1000, ttl=300) # set a lower ttl for new domains added to the safelist during i_validateDomain_MX to come into affect
 app = flask.Flask(__name__)
-safeList={'gmail.com'}
+safeList={'gmail.com','argos.co.uk','homeretailgroup.com'}
 
 app.config["DEBUG"] = False
 
@@ -19,7 +19,6 @@ log.setLevel(logging.ERROR)
 def i_validateDomain_MX(domain):  # function performing under cache to reduce the number of calls
     try:
         if domain in safeList:
-            print ("safelist")
             return True
         else:
             query(domain, 'MX')
@@ -60,7 +59,7 @@ def suggestCorrectDomain():
         return "Error: No domain field provided. Please specify a domain."
     return jsonify(results)
 
-@app.route('/admin/safeListSize',methods=['GET'])
+@app.route('/admin/',methods=['GET'])
 def listSize():
     if 'safelistsize' in request.args:
         results = str(len(safeList))
