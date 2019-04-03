@@ -4,18 +4,18 @@ from difflib import get_close_matches
 from flask import request, jsonify
 from cachetools import cached, TTLCache
 
-#cache_validateDomain = TTLCache(maxsize=8000, ttl=2000)
-cache_suggestDomain = TTLCache(maxsize=8000, ttl=2000) # set a lower ttl for new domains added to the safelist during i_validateDomain_MX to come into affect
+cache_validateDomain = TTLCache(maxsize=1000, ttl=300)
+cache_suggestDomain = TTLCache(maxsize=1000, ttl=300) # set a lower ttl for new domains added to the safelist during i_validateDomain_MX to come into affect
 app = flask.Flask(__name__)
 safeList={'gmail.com','argos.co.uk','homeretailgroup.com'}
 
-app.config["DEBUG"] = True
+app.config["DEBUG"] = False
 
-##import logging
-##log = logging.getLogger('werkzeug')
-##log.setLevel(logging.ERROR)
+import logging
+log = logging.getLogger('werkzeug')
+log.setLevel(logging.ERROR)
 
-#@cached(cache_validateDomain)
+@cached(cache_validateDomain)
 def i_validateDomain_MX(domain):  # function performing under cache to reduce the number of calls
     try:
         if domain in safeList:
